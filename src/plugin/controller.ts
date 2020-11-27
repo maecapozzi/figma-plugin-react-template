@@ -1,24 +1,33 @@
 figma.showUI(__html__);
 
-figma.ui.onmessage = (msg) => {
-    if (msg.type === 'create-rectangles') {
-        const nodes = [];
+figma.ui.onmessage = async (msg) => {
+    if (msg.type === 'semantic-version') {
+        let textNode;
+        const traverse = (node: any) => {
+            if (node.name === 'SemanticVersion') {
+                textNode = node;
+            }
 
-        for (let i = 0; i < msg.count; i++) {
-            const rect = figma.createRectangle();
-            rect.x = i * 150;
-            rect.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-            figma.currentPage.appendChild(rect);
-            nodes.push(rect);
-        }
+            if (node.children) {
+                for (var i = 0; i < node.children.length; i++) {
+                    if (node.children[i].name === 'SemanticVersion') {
+                        textNode = node.children[i];
+                    }
 
-        figma.currentPage.selection = nodes;
-        figma.viewport.scrollAndZoomIntoView(nodes);
+                    traverse(node.children[i]);
+                }
+            }
+        };
+
+        traverse(figma.root);
+        const node = figma.getNodeById(textNode.id) as TextNode;
+        await figma.loadFontAsync({family: 'Helvetica Neue', style: 'Bold'});
+        node.characters = `v${msg.data.data.version}`;
 
         // This is how figma responds back to the ui
         figma.ui.postMessage({
-            type: 'create-rectangles',
-            message: `Created ${msg.count} Rectangles`,
+            type: 'semantic-version',
+            message: `Updated the cover page with the new version number: ${msg.data.data.version}`,
         });
     }
 
