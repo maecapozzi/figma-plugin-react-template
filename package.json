@@ -5,8 +5,7 @@
   "license": "ISC",
   "scripts": {
     "build": "webpack --mode=production",
-    "build:watch": "webpack --mode=development --watch",
-    "prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' "
+    "build:watch": "webpack --mode=development --watch"
   },
   "dependencies": {
     "@types/figma": "^1.0.3",
@@ -38,7 +37,6 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,css,json}": [
-      "prettier --write",
       "git add"
     ]
   }
